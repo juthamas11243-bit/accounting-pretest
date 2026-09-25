@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-test บัญชีเบื้องต้น | เปิดร้านกันเถอะ!</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Tahoma",sans-serif;background:linear-gradient(135deg,#fff4f8,#f7f1fb);color:#493d48;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{width:min(760px,100%)}.top{text-align:center;margin-bottom:18px}.tag{display:inline-block;background:#f7dbe7;color:#9a4f72;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700}.top h1{margin:10px 0 5px;font-size:clamp(26px,5vw,38px)}.top p{margin:0;color:#756a75}
+.card{background:#fff;border:1px solid #eadfe7;border-radius:24px;padding:28px;box-shadow:0 12px 35px rgba(91,65,83,.10)}
+.info{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}.score{background:#fff0f6;color:#a0446f;padding:8px 14px;border-radius:999px;font-weight:700}.bar{height:9px;background:#eee8ed;border-radius:999px;overflow:hidden;margin-bottom:25px}.bar>div{height:100%;width:10%;background:#d982a8;border-radius:999px;transition:.3s}
+.q{font-size:22px;font-weight:800;line-height:1.5;margin-bottom:20px}.choices{display:grid;gap:12px}.choice{border:2px solid #e9e3e8;background:#faf8fa;border-radius:15px;padding:15px;text-align:left;font-size:16px;font-weight:600;cursor:pointer;transition:.15s}.choice:hover{background:#fff2f7;border-color:#e0a0ba;transform:translateY(-1px)}.choice:disabled{cursor:default}.choice.correct{background:#eaf8ef;border-color:#80c89a;color:#24643a}.choice.wrong{background:#fff0f1;border-color:#e79aa3;color:#8b3038}
+.feedback{min-height:28px;margin-top:16px;font-weight:700}.green{color:#28733f}.red{color:#a33b45}
+.next,.restart{width:100%;border:0;border-radius:14px;padding:14px;margin-top:10px;background:#514452;color:#fff;font-size:16px;font-weight:800;cursor:pointer}.next:disabled{opacity:.4;cursor:not-allowed}.restart{background:#d36f9b}
+.result{text-align:center}.trophy{font-size:60px}.result h2{font-size:30px;margin:8px 0}.big{font-size:42px;color:#b44e7c;font-weight:900}.level{font-size:20px;font-weight:800;margin:8px 0}.small{color:#7b707a;line-height:1.6}.hidden{display:none}
+@media(max-width:520px){body{padding:12px}.card{padding:20px}.q{font-size:19px}.choice{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top">
+    <span class="tag">PRE-TEST • วิชาการบัญชีเบื้องต้น</span>
+    <h1>🏪 เปิดร้านกันเถอะ!</h1>
+    <p>หน่วยที่ ๑ ความรู้เบื้องต้นเกี่ยวกับกิจการเจ้าของคนเดียว ประเภทธุรกิจบริการ</p>
+  </div>
+
+  <div class="card" id="quizCard">
+    <div class="info">
+      <strong id="progressText">ข้อ 1 จาก 10</strong>
+      <div class="score" id="score">คะแนน 0/10</div>
+    </div>
+    <div class="bar"><div id="progress"></div></div>
+    <div class="q" id="question"></div>
+    <div class="choices" id="choices"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next" id="next" disabled>ข้อต่อไป →</button>
+  </div>
+
+  <div class="card result hidden" id="result"></div>
+</div>
+
+<script>
+const questions = [
+ {q:"กิจการเจ้าของคนเดียว หมายถึงข้อใด?", a:["ธุรกิจที่มีเจ้าของเพียง ๑ คน","ธุรกิจที่มีหุ้นส่วนตั้งแต่ ๒ คนขึ้นไป","ธุรกิจที่มีผู้ถือหุ้นจำนวนมาก","ธุรกิจที่รัฐบาลเป็นเจ้าของ"],c:0},
+ {q:"ข้อใดเป็นตัวอย่างของ “ธุรกิจบริการ”?", a:["ร้านขายเสื้อผ้า","ร้านเสริมสวย","โรงงานผลิตรองเท้า","ร้านขายเครื่องเขียน"],c:1},
+ {q:"คุณนัทเปิดร้านรับซ่อมโทรศัพท์เพียงคนเดียว ธุรกิจนี้จัดเป็นอะไร?", a:["กิจการเจ้าของคนเดียว ประเภทธุรกิจบริการ","ห้างหุ้นส่วน","บริษัทจำกัด","ธุรกิจอุตสาหกรรม"],c:0},
+ {q:"รายได้หลักของกิจการบริการเรียกว่าอะไร?", a:["รายได้จากการขายสินค้า","รายได้ค่าบริการ","เงินลงทุน","เจ้าหนี้"],c:1},
+ {q:"ข้อใด “ไม่ใช่” ลักษณะของกิจการเจ้าของคนเดียว?", a:["มีเจ้าของเพียงคนเดียว","เจ้าของมีอำนาจตัดสินใจ","มีผู้ถือหุ้นจำนวนมาก","เจ้าของได้รับผลกำไรจากกิจการ"],c:2},
+ {q:"ข้อใดเป็นการจำแนกธุรกิจตาม “ลักษณะของกิจการที่กระทำ”?", a:["เจ้าของคนเดียว / ห้างหุ้นส่วน / บริษัท","บริการ / ซื้อขายสินค้า / ผลิต","ขนาดเล็ก / ขนาดกลาง / ขนาดใหญ่","ภาครัฐ / ภาคเอกชน"],c:1},
+ {q:"นักเรียนเปิดเพจรับออกแบบโลโก้ออนไลน์เพียงคนเดียว ธุรกิจนี้จัดเป็นอะไร?", a:["ธุรกิจซื้อขายสินค้า","ธุรกิจบริการ","ธุรกิจอุตสาหกรรม","ธุรกิจการเกษตร"],c:1},
+ {q:"ข้อใดเป็นข้อดีของกิจการเจ้าของคนเดียว?", a:["มีเจ้าของหลายคน","ระดมทุนจากผู้ถือหุ้นได้จำนวนมาก","ตัดสินใจในการดำเนินงานได้รวดเร็ว","ไม่ต้องรับผิดชอบผลขาดทุน"],c:2},
+ {q:"ข้อใดเป็นตัวอย่างของธุรกิจบริการออนไลน์?", a:["โรงงานผลิตน้ำดื่ม","รับตัดต่อวิดีโอออนไลน์","ร้านขายเครื่องใช้ไฟฟ้า","ร้านขายเสื้อผ้า"],c:1},
+ {q:"มินเปิดร้านรับทำบัญชีออนไลน์คนเดียว ลูกค้าจ่ายเงินเพื่อให้จัดทำบัญชี ข้อใดถูกต้องที่สุด?", a:["กิจการเจ้าของคนเดียว ประเภทธุรกิจบริการ","ธุรกิจซื้อขายสินค้า","ธุรกิจอุตสาหกรรม","ห้างหุ้นส่วน"],c:0}
+];
+
+let current=0, score=0, answered=false;
+const qEl=document.getElementById("question"), choicesEl=document.getElementById("choices");
+const feedbackEl=document.getElementById("feedback"), nextBtn=document.getElementById("next");
+
+function render(){
+  answered=false; nextBtn.disabled=true;
+  feedbackEl.textContent=""; feedbackEl.className="feedback";
+  qEl.textContent=questions[current].q; choicesEl.innerHTML="";
+  questions[current].a.forEach((text,i)=>{
+    const b=document.createElement("button");
+    b.className="choice"; b.type="button";
+    b.textContent=String.fromCharCode(0x0e01+i)+". "+text;
+    b.onclick=()=>answer(i,b);
+    choicesEl.appendChild(b);
+  });
+  document.getElementById("progressText").textContent=`ข้อ ${current+1} จาก ${questions.length}`;
+  document.getElementById("score").textContent=`คะแนน ${score}/${questions.length}`;
+  document.getElementById("progress").style.width=((current+1)/questions.length*100)+"%";
+  nextBtn.textContent=current===questions.length-1?"🏆 ดูผลคะแนน":"ข้อต่อไป →";
+}
+function answer(index,button){
+  if(answered)return; answered=true;
+  const correct=index===questions[current].c;
+  if(correct){
+    score++; button.classList.add("correct");
+    feedbackEl.textContent="🎉 ถูกต้อง!"; feedbackEl.classList.add("green");
+  }else{
+    button.classList.add("wrong");
+    choicesEl.children[questions[current].c].classList.add("correct");
+    feedbackEl.textContent="💡 คำตอบที่ถูกต้องแสดงด้วยสีเขียว";
+    feedbackEl.classList.add("red");
+  }
+  [...choicesEl.children].forEach(b=>b.disabled=true);
+  document.getElementById("score").textContent=`คะแนน ${score}/${questions.length}`;
+  nextBtn.disabled=false;
+}
+nextBtn.onclick=()=>{
+  if(!answered)return;
+  if(current<questions.length-1){current++;render();}
+  else showResult();
+};
+function showResult(){
+  document.getElementById("quizCard").classList.add("hidden");
+  const result=document.getElementById("result");
+  result.classList.remove("hidden");
+  let level=score>=9?"🌟 พร้อมลุยธุรกิจ!":score>=7?"💜 มีพื้นฐานดี":score>=5?"💗 มีพื้นฐานบางส่วน":"🌱 เริ่มต้นเรียนรู้";
+  result.innerHTML=`<div class="trophy">🏆</div>
+    <h2>จบเกมแล้ว!</h2>
+    <div class="big">${score} / ${questions.length}</div>
+    <div class="level">${level}</div>
+    <p class="small">คะแนนนี้ใช้สำหรับสำรวจความรู้เดิมก่อนเรียน ไม่ใช่คะแนนตัดสินผลการเรียน</p>
+    <button class="restart" onclick="restart()">🔄 เล่นอีกครั้ง</button>`;
+}
+function restart(){
+  current=0;score=0;
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("quizCard").classList.remove("hidden");
+  render();
+}
+render();
+</script>
+</body>
+</html>
